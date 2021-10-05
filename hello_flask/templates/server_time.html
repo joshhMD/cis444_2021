@@ -1,17 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <!-- head definitions go here -->
-	 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-    </head>
-    <body>
-	            <script>
+	<head>
+		<!-- head definitions go here -->
+			 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	</head>
+	<body>
+	       <script>
+		        var today;
+			var currentDay;
+			var currentSecond;
 
-               			 setInterval( function(){ $('#mytime').html( "Client Time is " + new Date());}, 500);
-				 setInterval( function(){ $('#hello').html( "hello");}, 500);
+		        setInterval( function(){ today = new Date()}, 500);
+               		setInterval( function(){ $('#mytime').html( "Local Time " + today);}, 500);
+			setInterval( function(){ $('#Month').html( "Months Until Christmas: " + (12 - today.getMonth()));}, 500);
+			setTimeout( function(){
+				var christmas=new Date(today.getFullYear(), 11, 25);
+				if (today.getMonth()==11 && today.getDate()>25) 
+				{
+					christmas.setFullYear(christmas.getFullYear()+1);
+			        }
+				var one_Second=1000*60*60*24;
+				var tempSecond = 1000;
+				currentDay = Math.ceil((christmas.getTime()-today.getTime())/(one_Second));
+				currentSecond = Math.ceil((christmas.getTime()-today.getTime())/(tempSecond));
+			}, 500);
+			setInterval( function(){ $('#Day').html("Days Until Christmas: " + currentDay);}, 500);
+			setInterval( function(){ 
+				currentSecond = currentSecond - 1;
+				$('#Second').html("Seconds Until Christmas: " + currentSecond);}, 1000);
+			
         	</script>
-	    <h1 id="mytime"></h1>
-	    <h2 id="hello"> </h2>
-	    <h1>Server Time is {{server_time}}</h1>
-    </body>
+		<h1 id="mytime"></h1>
+		<img src="{{img_url}}"></img>
+		<h2 id="Month"></h2>
+		<h2 id="Day"></h2>
+		<h2 id="Second"></h2>		
+		<h1>Server Time is {{server_time}}</h1>
+	</body>
 </html>
