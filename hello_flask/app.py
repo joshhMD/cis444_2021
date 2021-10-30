@@ -24,7 +24,7 @@ def index():
 def buy():
     return 'Buy'
 
-@app.route('/hello') #endpoint
+@app.route('/hello') #endpoint 1
 def hello():
     return render_template('hello.html',img_url=IMGS_URL[CUR_ENV] ) 
 
