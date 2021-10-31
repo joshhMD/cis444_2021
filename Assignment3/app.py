@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,jsonify,request,send_from_directory
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 import jwt
 
@@ -28,22 +28,80 @@ global_db_con = get_db()
 with open("secret", "r") as f:
     JWT_SECRET = f.read()
 
-#Make user account and return jwt
-@app.route('/auth')
-def authenticate():
-    return("return jwt")
+
+#Welcome Base Page
+@app.route('/welcome')
+def welcome():
+    return send_from_directory('static','welcome.html')
+
+
+
+# Creates User Account
+@app.route('/create', methods=['POST'])
+def createAccount():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    db = global_db_con.cursor()
+    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s;"),(username,))
+    userPass = db.fetchone()
+
+    if userPass != None:
+        db.close()
+
+        if userPass[2] == password:
+            return(f"Account already active. JWT token = {userPass[0]}")
+
+        return(f"An account with {username} is already taken")
+
+    token = jwt.encode(
+            {
+                'username': username,
+                'password': password
+            }, JWT_SECRET, algorithm="HS256")
+
+    db.execute(sql.SQL("INSERT INTO users (token, username, password) VALUES (%s, %s, %s);"), (token, username,password))
+    db.close()
+
+    global_db_con.commit()
+
+    return(f"Successfully created account. Username = {username} and token = {token}")
+
+
+
 
 #Returns list of books given jwt
 @app.route('/books')
 def getBooks():
-    return("books")
+
+    token = request.headers.get('JWT')
+
+    db = global_db_con.cursor()
+    db.execute(sql.SQL("SELECT * FROM users WHERE token = %s;"),(token,))
+    userInfo = db.fetchone()
+    db.close()
+
+    if(userInfo == None):
+        return("Invalid Token")
 
 
-#Welcome Base Page
-@app.route('/')
-def welcome():
-    return render_template('welcome.html')
+
+    db = global_db_con.cursor()
+    db.execute(sql.SQL("SELECT * FROM books"))
+    currentBooks = db.fetchall()
+
+
+
+    if(currentBooks == None):
+        return("The store currently does not have books")
+
+    books = []
+
+    for book in currentBooks:
+        books.append({"ISBN": book[0], "Title": book[1], "Author": book[2], "Price": book[3] + " USD"})
+
+    return jsonify(books)
 
 
 app.run(host='0.0.0.0', port=80)
-
