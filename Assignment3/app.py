@@ -36,7 +36,7 @@ def welcome():
 
 
 
-#Creates User Account
+# Creates User Account
 @app.route('/create', methods=['POST'])
 def createAccount():
     data = request.get_json()
