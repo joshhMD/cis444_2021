@@ -39,9 +39,12 @@ def welcome():
 # Creates User Account
 @app.route('/create', methods=['POST'])
 def createAccount():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
+    username = request.form['username']
+    password = request.form['password']
+    
+    #data = request.get_json()
+    #username = data['username']
+    #password = data['password']
 
     db = global_db_con.cursor()
     db.execute(sql.SQL("SELECT * FROM users WHERE username = %s;"),(username,))
@@ -69,6 +72,30 @@ def createAccount():
     return(f"Successfully created account. Username = {username} and token = {token}")
 
 
+#Checks if credentials are correct
+@app.route('/login', methods=['POST'])
+def login():
+    #data = request.get_json()
+    #username = data['username']
+    
+
+    username = request.form['username']
+    password = request.form['password']
+
+    db = global_db_con.cursor()
+    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s"),(username,))
+    userPass = db.fetchone()
+
+    db.close()
+    
+    if userPass == None:
+        return "false"
+
+    else:
+        if password != userPass[2]:
+            return "true"
+        else:
+            return "false"
 
 
 #Returns list of books given jwt

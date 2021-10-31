@@ -5,43 +5,76 @@
     </head>
     <body>
 
+
+
+	    <div id="Login">
+	    	<input type="text" id="username" name="username"></input>
+		<br>
+		<input type="password" id="password" name="password"></input>
+		<br>
+		<input type="submit" value="test" id="loginButton" onclick="return login()">
+
+	    </div>
+	    <div id="Register">
+	    	<br>
+		<br>
+		<button onclick="location.href = 'static/register.html';" id="myButton" class="float-left submit-button" >Not Registered? Click Here!</button>
+	    </div>
+
 	<script>
-		function check_form(){
 
-			alert($('#fname').val());
-			alert($('#lname').val());
+		function showBooks()
+		{
+			console.log("These are the books")
+			alert("Books!")
+		}
 
-			$('#login').hide();
-			$('#books').show();
+
+
+		function login()
+		{
+			loginTest().then(results => {
+				if(results == true)
+				{
+					showBooks();
+					return true;
+				}
+				else
+				{
+					var form = document.getElementById("username");
+					form.value = '';
+					var form2 = document.getElementById("password");
+					form2.value = '';
+					alert("Invalid Login Credentials")
+					return false;
+				}
+			});
+		}
+
+
+
+
+
+		async function loginTest()
+		{
 			
-			$('#cars').append('<option value="volvo">Thank you Taco</option>')
-
-
-			return false;
-
-			if($('#fname').val().length == 0){
+			resultsTemp = await $.post("/login", 
+				{
+					username: $('#username').val(), 
+					password: $('#password').val()
+				});
+						
+			if(resultsTemp == 'false')
+			{
 				return false;
-			}else{
+			}
+			else if(resultsTemp == 'true')
+			{
 				return true;
 			}
 		}
 
 	</script>
-            <div id="Register">
-		    <input type="text" id="username" name="username"></input>
-		    <br>
-		    <input type="text" id="password" name="password"></input>
-		    <br>
-		    <button id="registerButton" onclick="login();">Login</button>
-	    </div>
-
-	    <div id="Login">
-		    <br>
-		    <br>
-		    <button onclick="location.href = 'static/register.html';" id="myButton" class="float-left submit-button" >Not Registered? Click Here!</button>
-
-
-	    </div>
-
+            
     </body>
 </html>
