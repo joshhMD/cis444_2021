@@ -27,21 +27,20 @@
 		}
 
 	</script>
-            <div id="login">
-	    	<form action="/backp" method="post">
-  			<label for="fname">First name:</label><br>
-  				<input type="text" id="fname" name="fname" value="John"><br>
-  			<label for="lname">Last name:</label><br>
-  				<input type="password" id="lname" name="lname" value="Doe"><br><br>
-  			<input type="submit" value="Signup" onclick="return check_form();">
-		</form>
+            <div id="Register">
+		    <input type="text" id="username" name="username"></input>
+		    <br>
+		    <input type="text" id="password" name="password"></input>
+		    <br>
+		    <button id="registerButton" onclick="login();">Login</button>
 	    </div>
 
-	    <div id="books" style="display:none">
-		    <h1>Buy me</h1>
-		    <select name="cars" id="cars">
+	    <div id="Login">
+		    <br>
+		    <br>
+		    <button onclick="location.href = 'static/register.html';" id="myButton" class="float-left submit-button" >Not Registered? Click Here!</button>
 
-  		    </select>
+
 	    </div>
 
     </body>
