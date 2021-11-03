@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+             <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+
+
+
+            <div id="Login">
+                <input type="text" id="username" name="username"></input>
+                <br>
+                <input type="password" id="password" name="password"></input>
+                <br>
+                <input type="submit" value="test" id="loginButton" onclick="return login()">
+		<br>
+		<br>
+		<br>
+            </div>
+
+        <script>
+
+                function showBooks()
+                {
+                        console.log("These are the books")
+                        alert("Books!")
+                }
+
+
+
+                function login()
+                {
+                        loginTest().then(results => {
+                                if(results == true)
+                                {
+                                        showBooks();
+                                        return true;
+                                }
+                                else
+                                {
+                                        var form = document.getElementById("username");
+                                        form.value = '';
+                                        var form2 = document.getElementById("password");
+                                        form2.value = '';
+                                        alert("Invalid Login Credentials")
+                                        return false;
+                                }
+                        });
+                }
+
+
+
+
+
+                async function getBooks()
+                {
+
+                        resultsTemp = await $.get("/books",
+                                {
+                                        username: $('#username').val(),
+                                        password: $('#password').val()
+                                });
+
+                        if(resultsTemp == 'false')
+                        {
+                                return false;
+                        }
+                        else if(resultsTemp == 'true')
+                        {
+                                return true;
+                        }
+                }
+
+        </script>
+
+    </body>
+</html>
