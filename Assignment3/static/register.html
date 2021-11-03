@@ -7,15 +7,15 @@
 
 
 
-            <div id="Register">
-                <input type="text" id="username" name="username"></input>
+            <div id="Register" style="text-align:center;">
+                <input type="text" id="username" name="username" placeholder="Username" style="margin-top: 30px;  margin-bottom: 10px; width: 300px; border: 1px solid black;"></input>
                 <br>
-                <input type="password" id="password" name="password"></input>
+                <input type="password" id="password" name="password" placeholder="Password" style="margin-bottom: 10px; width: 300px; border: 1px solid black;"></input>
                 <br>
                 <input type="submit" value="Register" id="registerButton" onclick="return login()">
 
             </div>
-            <div id="Login">
+            <div id="Login" style="text-align:center;">
                 <br>
                 <br>
                 <button onclick="location.href = '../welcome';" id="myButton" class="float-left submit-button" >Already a User? Click Here!</button>
@@ -26,7 +26,6 @@
                 function showBooks()
                 {
                         console.log("These are the books")
-                        alert("Books!")
                 }
 
 
