@@ -88,13 +88,14 @@ def createAccount():
     #password = data['password']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s;"),(username,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE username = %s;").format(sql.Identifier('users')),(username,))
     userPass = db.fetchone()
 
     if userPass != None:
         db.close()
-
-        if userPass[2] == password:
+        
+        tempPass = bytes(userPass[2], 'utf-8')
+        if bcrypt.checkpw(bytes(password, 'utf-8'), tempPass):
             return(f"Account already active. JWT token = {userPass[0]}")
 
         return(f"An account with {username} is already taken")
@@ -129,7 +130,7 @@ def authAccount():
     #password = data['password']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s;"),(username,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE username = %s;").format(sql.Identifier('users')),(username,))
     userPass = db.fetchone()
     db.close()
 
@@ -159,7 +160,7 @@ def login():
     password = request.form['password']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s"),(username,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE username = %s").format(sql.Identifier('users')),(username,))
     userPass = db.fetchone()
 
     db.close()
@@ -182,7 +183,7 @@ def getBooks():
     token = request.headers.get('JWT')
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE token = %s;"),(token,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE token = %s;").format(sql.Identifier('users')),(token,))
     userInfo = db.fetchone()
     db.close()
 
@@ -217,7 +218,7 @@ def purchaseBook():
     title = request.form['title']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE token = %s;"),(token,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE token = %s;").format(sql.Identifier('users')),(token,))
     userInfo = db.fetchone()
     db.close()
 
@@ -227,7 +228,7 @@ def purchaseBook():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM books WHERE title = %s;"),(title,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE title = %s;").format(sql.Identifier('books')),(title,))
     buy = db.fetchone()
     db.close()
 
@@ -239,7 +240,7 @@ def purchaseBook():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM purchases WHERE title = %s;"),(title,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE title = %s;").format(sql.Identifier('purchases')),(title,))
     tempCheck = db.fetchone()
     db.close()
 
@@ -265,7 +266,7 @@ def sellBook():
     title = request.form['title']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE token = %s;"),(token,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE token = %s;").format(sql.Identifier('users')),(token,))
     userInfo = db.fetchone()
     db.close()
 
@@ -275,7 +276,7 @@ def sellBook():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM purchases WHERE title = %s;"),(title,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE title = %s;").format(sql.Identifier('purchases')),(title,))
     tempCheck = db.fetchone()
     db.close()
 
@@ -305,7 +306,7 @@ def purchaseHistory():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM purchases WHERE username = %s;"),(userN,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE username = %s;").format(sql.Identifier('purchases')),(userN,))
     historyDB = db.fetchall()
     db.close() 
     
