@@ -46,7 +46,7 @@ def registerAccount():
     #password = data['password']
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("SELECT * FROM users WHERE username = %s;"),(username,))
+    db.execute(sql.SQL("SELECT * FROM {} WHERE username = %s;").format(sql.Identifier('users')),(username,))
     userPass = db.fetchone()
 
     if userPass != None:
@@ -65,7 +65,7 @@ def registerAccount():
                 'password': password
             }, JWT_SECRET, algorithm="HS256")
 
-    db.execute(sql.SQL("INSERT INTO users (token, username, password) VALUES (%s, %s, %s);"), (token, username,password))
+    db.execute(sql.SQL("INSERT INTO {} (token, username, password) VALUES (%s, %s, %s);").format(sql.Identifier('users')), (token, username,password))
     db.close()
 
     global_db_con.commit()
@@ -111,7 +111,7 @@ def createAccount():
                 'password': password
             }, JWT_SECRET, algorithm="HS256")
 
-    db.execute(sql.SQL("INSERT INTO users (token, username, password) VALUES (%s, %s, %s);"), (token, username,password))
+    db.execute(sql.SQL("INSERT INTO {} (token, username, password) VALUES (%s, %s, %s);").format(sql.Identifier('users')), (token, username,password))
     db.close()
 
     global_db_con.commit()
@@ -249,7 +249,7 @@ def purchaseBook():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("INSERT INTO purchases (username, title, price, date) VALUES (%s, %s, %s, %s);"), (userN, title, price, buyDate))
+    db.execute(sql.SQL("INSERT INTO {} (username, title, price, date) VALUES (%s, %s, %s, %s);").format(sql.Identifier('purchases')), (userN, title, price, buyDate))
     db.close()
 
     global_db_con.commit()
@@ -285,7 +285,7 @@ def sellBook():
 
 
     db = global_db_con.cursor()
-    db.execute(sql.SQL("DELETE FROM purchases WHERE title = %s"), (title,))
+    db.execute(sql.SQL("DELETE FROM {} WHERE title = %s").format(sql.Identifier('purchases')), (title,))
     db.close()
 
     global_db_con.commit()
