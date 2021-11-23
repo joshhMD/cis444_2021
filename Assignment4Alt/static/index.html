@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+	<style>
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+
+		.hide{
+			display:none;
+		}
+		.show{
+			display:block;
+		}
+			
+
+			
+
+	     </style>	
+
+
+	     <script src="https://code.jquery.com/jquery-3.6.0.js" 
+		     integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	     <script src="/static/cis444.js"></script>
+	     <script src="/static/cis444_2.js"></script>
+    </head>
+    <body>
+
+	<script>
+		function login(){
+			$.post("/open_api/login", { "username":$('#username').val(), "password":$('#password').val()},
+                       		function(data, textStatus) {
+					if(data["message"] == 'Invalid credentials')
+					{
+						var form = document.getElementById("username");
+                                        	form.value = '';
+                                        	var form2 = document.getElementById("password");
+                                        	form2.value = '';
+                                        	alert("Invalid Login Credentials")
+                                        	return false;
+					}
+					else
+					{
+						var form = document.getElementById("username");
+		                        	form.style.display = "none";
+                		        	var form2 = document.getElementById("password");
+                        			form2.style.display = "none";
+                 				var form3 = document.getElementById("loginButton");
+                     				form3.style.display = "none"
+                        			
+
+						//this gets called when browser receives response from server
+                                        	
+                                        	//Set global JWT
+                                        	jwt = data.token;
+                                        	//make secure call with the jwt
+                                        	get_books();
+					}
+
+					
+				}, "json").fail( function(response) {
+					//this gets called if the server throws an error
+					console.log("error");
+					console.log(response);
+				});
+			return false;
+		}
+
+		function get_books(){
+
+			tempTable = document.getElementById("bookTable");
+			tempTable.style.display = "block";
+			histBut = document.getElementById("historyButton");
+			histBut.style.display = "block";
+			bookHeader = document.getElementById("avail");
+			bookHeader.style.display = "block";
+
+
+
+			 //make secure call with the jwt
+			secure_get_with_token("/secure_api/get_books", {} , function(data1){
+
+					let tableRef = document.getElementById("bookTable");
+						var data = data1["books"]
+						for(book in data)
+						{
+							var tempObj = data[book]
+							var count = 0;
+							let newRow = tableRef.insertRow(-1);
+							const keys = Object.keys(tempObj);
+
+							keys.forEach((key, index) => {
+								var newCell = newRow.insertCell(count)
+								let newText = document.createTextNode(tempObj[key])
+								newCell.appendChild(newText);
+
+								if(count == 3)
+								{
+									var buttonCell = newRow.insertCell(4);
+									var btn = document.createElement('input');
+									btn.type="button";
+									btn.className = "btn";
+									btn.value = "Buy Me!";
+									btn.id = tempObj.Title;
+									btn.onclick = function() {
+										purchaseBook(this.id);
+									}
+									buttonCell.appendChild(btn);
+
+
+									
+                                                                        var btn2 = document.createElement('input');
+                                                                        btn2.type="button";
+                                                                        btn2.className = "btn";
+                                                                        btn2.value = "Sell Me!";
+                                                                        btn2.id = tempObj.Title;
+                                                                        btn2.onclick = function() {
+                                                                                sellBook(this.id);
+                                                                        }
+                                                                        buttonCell.appendChild(btn2);
+																		
+								}
+								count = count + 1;
+							});
+						}
+					
+
+
+
+					},
+                                                function(err){ console.log(err) });
+		}
+                
+
+
+		async function history()
+		{
+			
+			$.post("/open_api/history", { "username":$('#username').val()},
+                       		function(data, textStatus) {
+					historyRes = data["data"]
+					hisTable = document.getElementById("historyTable");
+					hisTable.style.display = "block";
+
+					while(hisTable.rows.length > 1)
+					{
+						hisTable.deleteRow(1);
+					}
+
+					for(transaction in historyRes)
+					{
+						var tempObj = historyRes[transaction]
+						var count = 0;
+						let newRow = hisTable.insertRow(-1);
+						const keys = Object.keys(tempObj);
+						keys.forEach((key, index) => {
+							var newCell = newRow.insertCell(count)
+							let newText = document.createTextNode(tempObj[key])
+							newCell.appendChild(newText);
+							count = count + 1;
+		                                });	
+					}
+
+
+
+
+				}, "json").fail( function(response) {
+					//this gets called if the server throws an error
+					console.log("error");
+					console.log(response);
+				});
+
+			
+		}	
+
+
+
+
+		async function purchaseBook(book)
+		{
+			secure_get_with_token_2("/secure_api/purchase", {"title": book, "username": $('#username').val()} , function(data1){
+				data = data1["data"]
+				alert(data)
+
+			},  function(err){ console.log(err) });
+
+		}
+
+
+		async function sellBook(book)
+                {
+                       secure_get_with_token_2("/secure_api/sell", {"title": book} , function(data1){
+                                data = data1["data"]
+                                alert(data)
+
+                        },  function(err){ console.log(err) }); 
+                }	
+
+
+
+
+	</script>
+	   
+
+	    <div id="Login" style="text-align:center;">
+	    	<input type="text" id="username" name="username" placeholder="Username" style="margin-top: 30px;  margin-bottom: 10px; width: 300px; border: 1px solid black;"></input>
+		<br>
+		<input type="password" id="password" name="password" placeholder="Password" style="margin-bottom: 10px; width: 300px; border: 1px solid black;"></input>
+		<br>
+		<input type="submit" value="Login" id="loginButton" onclick="return login()">
+
+	    </div>
+
+
+	    <h2 id="avail" style="display:none;">AvailableBooks</h2>
+
+	    <br>
+	    <table id="bookTable" style="display: none;">
+		<tr>
+			<th>Author</th>
+			<th>ISBN</th>
+			<th>Price</th>
+			<th>Title</th>
+			<th>Purchases</th>
+		</tr>
+	    </table>
+	    <br>
+	    <br>
+	    <br>
+	    <input type="button" id="historyButton" name="answer" value="Purchase History" style="display: none;" onclick="history()" />
+
+	    <table id="historyTable" style="display: none;">
+                <tr>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Title</th>
+                        <th>Username</th>
+                </tr>
+            </table> 
+
+
+
+    </body>
+</html>
